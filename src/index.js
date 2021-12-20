@@ -1,10 +1,9 @@
 import * as LZ4 from 'lz4';
 import * as path from 'path';
 import fs from 'fs';
-import { appendToFile, convertLZ4FileToJson, getAllFilesInDirectory, getLogResultDirectory, getLz4FileName, getRootDirectory, Logger, readFile, readFileLineByLine, replaceName, writeToFile } from './helpers';
+import { convertLZ4FileToJson, createDirectories, getDirectories, getLogsDirectory, getLz4FileName, getRootDirectory, getTempDirectory, Logger, readFileLineByLine, writeToFile } from './helpers';
 
 function validateLog (log) {
-  return true;
   if (log.RequestPath) {
     return log.RequestPath.includes('validate/code?code=');
   }
@@ -16,17 +15,16 @@ function validateLog (log) {
   return false;
 }
 
-async function saveReferralRelatedLogs (data, fileName) {
-  const logDirectory = getLogResultDirectory(fileName);
+async function saveReferralRelatedLogs (data, logPath) {
   const validLogs = data.filter((log) => validateLog(log));
   if (validLogs.length) {
-    writeToFile(logDirectory, data);
+    Logger.info(`REFERRAL INFO FOUND IN ${logPath}`);
+    writeToFile(logPath, data);
   }
 }
 
 async function handleFileProcessing (filePath) {
   const filePathData = getLz4FileName(filePath);
-
   // 1) convert LZ4 to json
   await convertLZ4FileToJson(filePathData);
 
@@ -34,15 +32,29 @@ async function handleFileProcessing (filePath) {
   const data = readFileLineByLine(filePathData.jsonDirectory);
 
   // 3) save if any findings
-  saveReferralRelatedLogs(data, filePathData.jsonFileName);
+  saveReferralRelatedLogs(data, filePathData.logsDirectory);
 
   // 4) delete temporary created json file
   fs.unlinkSync(filePathData.jsonDirectory);
 }
 
-async function main () {
+function createFolders () {
+  const rootDirectoryPath = getRootDirectory();
+  const tempDirectoryPath = getTempDirectory();
+  const logsDirectoryPath = getLogsDirectory();
+  // create empty folders 
+  // based on the same structure of the root folder
+  const tempDirectory = getDirectories(rootDirectoryPath, tempDirectoryPath);
+  createDirectories(tempDirectory);
+
+  const logsDirectory = getDirectories(rootDirectoryPath, logsDirectoryPath);
+  createDirectories(logsDirectory);
+}
+
+async function filterBackupFiles () {
   const rootDirectory = getRootDirectory();
-  const allFilesPath = await getAllFilesInDirectory(rootDirectory);
+
+  const allFilesPath = getDirectories(rootDirectory);
   const filesLength = allFilesPath.length;
 
   Logger.info(`PROCESS FOR ${filesLength} FILES STARTED`);
@@ -55,6 +67,18 @@ async function main () {
   
   Logger.info('FILE PROCESSING COMPLETED!');
   Logger.space();
+}
+
+async function main () {
+  Logger.info('MAIN PROCESS STARTED...');
+
+  Logger.info('CREATING TEMP DIRECTORIES ...');
+  createFolders();
+  Logger.info('TEMP DIRECTORIES CREATED SUCCESSFULLY!');
+
+  Logger.info('FILTERING BACKUP FILES STARTED ...');
+  filterBackupFiles();
+  Logger.info('FILTERING BACKUP FILES COMPLETED!');
 }
 
 main();

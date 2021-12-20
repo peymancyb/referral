@@ -55,18 +55,4 @@ async function getFolderStructure (mainDir) {
   });
 }
 
-async function getAllFilesInDirectory (mainDir) {
-  const structure = {};
-  const folders = await readDirectory(mainDir);
-  const directories = folders.map(async (folder) => {
-    const list = await readDirectory(`${mainDir}/${folder}`);
-    structure[folder] = list;
-  });
-  await Promise.all(directories);
-  return Object.keys(structure).reduce((acc, key) => {
-    const fileList = structure[key].map(file => `${mainDir}/${key}/${file}`);
-    return [...acc, ...fileList];
-  }, []);
-}
-
-export { getFolderStructure, getAllFilesInDirectory };
+export { getFolderStructure };

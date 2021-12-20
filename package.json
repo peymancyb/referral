@@ -8,15 +8,19 @@
     "clean": "./node_modules/.bin/rimraf ./dist",
     "lint": "./node_modules/.bin/eslint --color --format stylish ./src --fix",
     "prebuild": "npm run clean",
-    "start": "nodemon ./node_modules/.bin/babel-node src/index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node ./node_modules/.bin/babel-node src/index.js",
+    "dev:start": "nodemon ./node_modules/.bin/babel-node src/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "pm2:start": "pm2 start 'npm run start' --no-autorestart",
+    "pm2:stop": "pm2 stop",
+    "pm2:restart": "pm2 restart",
+    "pm2:delete": "pm2 delete",
+    "pm2:list": "pm2 list",
+    "pm2:monit": "pm2 monit",
+    "pm2: logs": "pm2 log --lines 1000"
   },
-  "author": "Suvankar Kundu",
+  "author": "Peyman Ghazvini",
   "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/suvankar-kundu/node-express-es6-boilerplate.git"
-  },
   "keywords": [
     "nodejs",
     "boilerplate",
@@ -47,6 +51,7 @@
     "axios": "^0.18.0",
     "body-parser": "1.18.2",
     "cors": "2.8.4",
+    "directory-tree": "^3.0.1",
     "express": "4.16.2",
     "jsonlz4-decompress": "0.0.3",
     "lz4": "^0.6.5",
@@ -54,6 +59,7 @@
     "morgan": "1.9.0",
     "passport": "0.4.0",
     "passport-jwt": "3.0.1",
+    "pm2": "^5.1.2",
     "winston": "2.4.0",
     "winston-daily-rotate-file": "1.7.2"
   }

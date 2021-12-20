@@ -1,17 +1,18 @@
 import * as LZ4 from 'lz4';
 import * as path from 'path';
 import fs from 'fs';
-import { getJsonDirectory } from '.';
 
 function getLz4FileName (filePath) {
   const names = filePath.split('/');
   const fileName = names[names.length - 1]; 
   const jsonFileName = fileName.replace('.json.lz4', '.json');
-  const jsonDirectory = getJsonDirectory(jsonFileName);
+  const jsonDirectory = filePath.replace('sematext', 'temp');
+  const logsDirectory = filePath.replace('sematext', 'logs');
   return {
     fileName,
     jsonFileName,
     jsonDirectory,
+    logsDirectory,
     originalFilePath: filePath
   };
 }
