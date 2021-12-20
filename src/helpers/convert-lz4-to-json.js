@@ -6,8 +6,8 @@ function getLz4FileName (filePath) {
   const names = filePath.split('/');
   const fileName = names[names.length - 1]; 
   const jsonFileName = fileName.replace('.json.lz4', '.json');
-  const jsonDirectory = filePath.replace('sematext', 'temp');
-  const logsDirectory = filePath.replace('sematext', 'logs');
+  const jsonDirectory = filePath.replace('sematext_f89f792a', 'temp');
+  const logsDirectory = filePath.replace('sematext_f89f792a', 'logs');
   return {
     fileName,
     jsonFileName,
