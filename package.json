@@ -17,7 +17,7 @@
     "pm2:delete": "pm2 delete",
     "pm2:list": "pm2 list",
     "pm2:monit": "pm2 monit",
-    "pm2: logs": "pm2 log --lines 1000"
+    "pm2:logs": "pm2 log --lines 1000"
   },
   "author": "Peyman Ghazvini",
   "license": "MIT",
