@@ -3,9 +3,9 @@ import dirTree from 'directory-tree';
 import fs from 'fs';
 import { replaceName } from '.';
 
-const getRootDirectory = () => path.join(__dirname, '../../../sematext');
-const getTempDirectory = () => path.join(__dirname, '../../../temp');
-const getLogsDirectory = () => path.join(__dirname, '../../../logs');
+const getRootDirectory = () => path.join(__dirname, '../../../sematext_f89f792a');
+const getTempDirectory = () => path.join(__dirname, '../../../temp_f89f792a');
+const getLogsDirectory = () => path.join(__dirname, '../../../logs_f89f792a');
 
 const removePathExtension = (_path, mainPath, copyPath, extension = '.lz4') => {
   _path = _path.replace(mainPath, copyPath);
