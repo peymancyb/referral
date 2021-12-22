@@ -1,4 +1,4 @@
-import { getDirectories, getLogsDirectory, getSeparatedReferralAndBusinessDirectory, readFileLineByLine, writeToFile } from '.';
+import { getDirectories, getLogsDirectory, getSeparatedReferralAndBusinessDirectory, Logger, readFileLineByLine, writeToFile } from '.';
 const fs = require('fs');
 
 function getReferralCodesFromLog ({ 
@@ -21,7 +21,8 @@ function separateLogs () {
   const referralLogs = [];
   const businessLogs = [];
 
-  directories.forEach((_directory) => {
+  directories.forEach((_directory, _index) => {
+    Logger.info(`SEPARATING ${_index + 1} OUT OF ${directories.length} DIRECTORIES`);
     const content = fs.readFileSync(`${_directory}`);
     const data = content.toString().split(/\r?\n/);
     data.forEach((line, index) => {
