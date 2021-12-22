@@ -3,9 +3,15 @@ import dirTree from 'directory-tree';
 import fs from 'fs';
 import { replaceName } from '.';
 
-const getRootDirectory = () => path.join(__dirname, '../../../sematext_f89f792a');
-const getTempDirectory = () => path.join(__dirname, '../../../temp_f89f792a');
-const getLogsDirectory = () => path.join(__dirname, '../../../logs_f89f792a');
+const SEMA_TEXT_PATH = 'sematext_f89f792a';
+const LOGS_PATH = 'logs_f89f792a';
+const PROCESSED_FILES_PATH = 'processed_files';
+const SEPARATED_PATH = 'separated';
+
+const getRootDirectory = () => path.join(__dirname, `../../../${SEMA_TEXT_PATH}`);
+const getLogsDirectory = () => path.join(__dirname, `../../../${LOGS_PATH}`);
+const getProcessedDirectory = () => path.join(__dirname, `../../../${PROCESSED_FILES_PATH}`);
+const getSeparatedReferralAndBusinessDirectory = () => path.join(__dirname, `../../../${SEPARATED_PATH}`);
 
 const removePathExtension = (_path, mainPath, copyPath, extension = '.lz4') => {
   _path = _path.replace(mainPath, copyPath);
@@ -48,6 +54,12 @@ export {
   getRootDirectory,
   getDirectories,
   createDirectories,
-  getTempDirectory,
-  getLogsDirectory
+  getLogsDirectory,
+  getProcessedDirectory,
+  getSeparatedReferralAndBusinessDirectory,
+  SEMA_TEXT_PATH,
+  TEMP_PATH,
+  LOGS_PATH,
+  PROCESSED_FILES_PATH,
+  SEPARATED_PATH
 };

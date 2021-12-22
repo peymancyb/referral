@@ -31,14 +31,35 @@ function replaceLast (str, search, replace) {
   return str.replace(new RegExp(search + '([^' + search + ']*)$'), replace + '$1');
 }
 
+function validateData (log) {
+  if (log.RequestPath) {
+    return log.RequestPath.includes('validate/code?code=');
+  }
+  if (log.RequestPath) {
+    // example of business creation request
+    // "RequestPath": "/api/users/[user_id]/business",
+    return log.RequestPath.includes('api/users') && log.RequestPath.includes('business');
+  }
+  return false;
+}
+
 function readFileLineByLine (filePath) {
+  if (!fs.existsSync(filePath)) {
+    return [];
+  }
   const data = [];
   const content = fs.readFileSync(`${filePath}`);
   content.toString().split(/\r?\n/).forEach(function (line) {
     try {
-      data.push(JSON.parse(JSON.stringify(line)));
+      if (!line) {
+        return;
+      }
+      const _data = JSON.parse(`${line}`);
+      if (validateData(_data)) {
+        data.push(_data);
+      }
     } catch (e) {
-      console.log('line is not readable', line);
+      console.log('line is not readable', filePath, e);
     }
   });
   return data;
