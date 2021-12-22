@@ -58,7 +58,6 @@ export {
   getProcessedDirectory,
   getSeparatedReferralAndBusinessDirectory,
   SEMA_TEXT_PATH,
-  TEMP_PATH,
   LOGS_PATH,
   PROCESSED_FILES_PATH,
   SEPARATED_PATH
