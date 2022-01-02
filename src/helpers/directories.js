@@ -1,10 +1,9 @@
 import * as path from 'path';
 import dirTree from 'directory-tree';
 import fs from 'fs';
-import { replaceName } from '.';
 
-const SEMA_TEXT_PATH = 'sematext_f89f792a';
-const LOGS_PATH = 'logs_f89f792a';
+const SEMA_TEXT_PATH = 'months';
+const LOGS_PATH = 'logs';
 const PROCESSED_FILES_PATH = 'processed_files';
 const SEPARATED_PATH = 'separated';
 

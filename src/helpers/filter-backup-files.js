@@ -1,5 +1,3 @@
-import * as LZ4 from 'lz4';
-import * as path from 'path';
 import fs from 'fs';
 import pMap from 'p-map';
 import { appendToFile, convertLZ4FileToJson, getDirectories, getLz4FileName, getProcessedDirectory, getRootDirectory, Logger, readFileLineByLine, writeToFile } from './';

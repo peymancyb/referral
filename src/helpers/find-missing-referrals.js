@@ -1,47 +1,63 @@
-import { getDirectories, getLogsDirectory, getSeparatedReferralAndBusinessDirectory, Logger, readFileLineByLine, writeToFile } from '.';
+import { getDirectories, getLogsDirectory, getRootDirectory, getSeparatedReferralAndBusinessDirectory, Logger, readFileLineByLine, writeToFile } from '.';
 const fs = require('fs');
+const es = require('event-stream');
 
-function getReferralCodesFromLog ({ 
-  RequestPath, 
-  RequestMethod, 
+function getReferralCodesFromLog({
+  RequestPath,
+  RequestMethod,
   ClientHost
 }) {
   return {
-    RequestPath, 
+    RequestPath,
     RequestMethod,
     ClientHost,
     referral_code: RequestPath.split('code=')[1]
   };
 }
 
-function separateLogs () {
-  const logsDirectory = getLogsDirectory();
+async function separateLogs() {
+  const logsDirectory = getRootDirectory();
   const separatedDirectory = getSeparatedReferralAndBusinessDirectory();
   const directories = getDirectories(logsDirectory);
   const referralLogs = [];
   const businessLogs = [];
 
-  directories.forEach((_directory, _index) => {
+  const allPromises = directories.map((_directory, _index) => {
     Logger.info(`SEPARATING ${_index + 1} OUT OF ${directories.length} DIRECTORIES`);
-    const content = fs.readFileSync(`${_directory}`);
-    const data = content.toString().split(/\r?\n/);
-    data.forEach((line, index) => {
-      try {
-        if (!line) {
-          return;
+    return new Promise((resolve) => {
+      fs.createReadStream(`${_directory}`).pipe(es.split()).pipe(es.mapSync(function (_line) {
+        const line = _line.toString();
+        try {
+          if (!line) {
+            return;
+          }
+          const _log = JSON.parse(`${line}`);
+          if (_log.RequestPath && _log.RequestPath.includes('validate/code?code=')) {
+            referralLogs.push(getReferralCodesFromLog(_log));
+          }
+          if (_log.url && _log.url.includes('validate/code?code=')) {
+            referralLogs.push(getReferralCodesFromLog(_log));
+          }
+          if (_log.RequestPath && _log.RequestPath.includes('api/users') && _log.RequestPath.includes('business')) {
+            businessLogs.push(_log);
+          }
+          if (_log.url && _log.url.includes('api/users') && _log.url.includes('business')) {
+            businessLogs.push(_log);
+          }
+        } catch (e) {
+          console.log('line is not readable', e);
         }
-        const _log = JSON.parse(`${line}`);
-        if (_log.RequestPath.includes('validate/code?code=')) {
-          referralLogs.push(getReferralCodesFromLog(_log));
-        }
-        if (_log.RequestPath.includes('api/users') && _log.RequestPath.includes('business')) {
-          businessLogs.push(_log);
-        }
-      } catch (e) {
-        console.log('line is not readable');
-      }
+      })
+        .on('error', function (err) {
+          console.log('Error while reading file.', err);
+        })
+      ).on('end', () => {
+        resolve();
+      });
     });
   });
+
+  await Promise.all(allPromises);
 
   const referralCodePath = `${separatedDirectory}/referral.json`;
   writeToFile(referralCodePath, JSON.stringify(referralLogs));
@@ -71,16 +87,16 @@ const isMobile = {
   },
   any: function (userAgent) {
     return (
-      isMobile.Android(userAgent) || 
-        isMobile.BlackBerry(userAgent) || 
-        isMobile.iOS(userAgent) || 
-        isMobile.Opera(userAgent) || 
-        isMobile.Windows(userAgent)
+      isMobile.Android(userAgent) ||
+      isMobile.BlackBerry(userAgent) ||
+      isMobile.iOS(userAgent) ||
+      isMobile.Opera(userAgent) ||
+      isMobile.Windows(userAgent)
     );
   }
 };
 
-function findMissingReferrals (separatedLogs) {
+function findMissingReferrals(separatedLogs) {
   if (!separatedLogs) {
     console.log('no separated file found');
     return;
@@ -104,8 +120,8 @@ function findMissingReferrals (separatedLogs) {
     _businessLogs.forEach(business => {
       successfullyCreatedBusinesses.push(
         Object.assign(
-          {}, 
-          business, 
+          {},
+          business,
           {
             isMobile: business.user_agent ? isMobile.any(business.user_agent) : 'user agent not provided'
           }
